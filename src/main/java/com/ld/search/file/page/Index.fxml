@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ld.search.file.controller.IndexController">
+   <children>
+      <JFXListView fx:id="dataList" layoutY="200.0" prefHeight="400.0" prefWidth="1000.0" />
+      <JFXButton fx:id="search" layoutX="750.0" layoutY="50.0" onAction="#searchName" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #83cc44;" text="查询" textFill="#1a1b19" />
+      <JFXButton fx:id="update" layoutX="850.0" layoutY="130.0" onAction="#updateIndex" prefHeight="55.0" prefWidth="101.0" text="更新" />
+      <JFXTextField fx:id="fileName" focusColor="#3c3d40" layoutX="100.0" layoutY="50.0" prefHeight="50.0" prefWidth="600.0" promptText="请输入文件名" style="-fx-background-color: #a6ab9f;" unFocusColor="#1c1e1a" />
+   </children>
+</Pane>
