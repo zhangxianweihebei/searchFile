@@ -1,5 +1,4 @@
 /**  
- * Copyright © 2018LD. All rights reserved.
  *
  * @Title: TableView.java
  * @Prject: searchFile
@@ -11,16 +10,13 @@
  */
 package com.ld.search.file.core;
 
-import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
-
-import org.apache.lucene.document.Document;
 
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
-import com.ld.search.file.controller.User;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -42,6 +38,7 @@ public class TableView {
 	static JFXTreeTableColumn<DataModel, String> type = new JFXTreeTableColumn<>("类型");
 	static JFXTreeTableColumn<DataModel, String> size = new JFXTreeTableColumn<>("大小");
 	static JFXTreeTableColumn<DataModel, String> createTime = new JFXTreeTableColumn<>("创建时间");
+	static SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss");
 
 	static {
 		code.setPrefWidth(100);
@@ -60,7 +57,7 @@ public class TableView {
 				return name.getComputedValue(param);
 			}
 		});
-		path.setPrefWidth(100);
+		path.setPrefWidth(200);
 		path.setCellValueFactory((TreeTableColumn.CellDataFeatures<DataModel, String> param) -> {
 			if (path.validateValue(param)) {
 				return new SimpleStringProperty(param.getValue().getValue().getPath()+"");
@@ -68,7 +65,7 @@ public class TableView {
 				return path.getComputedValue(param);
 			}
 		});
-		type.setPrefWidth(100);
+		type.setPrefWidth(50);
 		type.setCellValueFactory((TreeTableColumn.CellDataFeatures<DataModel, String> param) -> {
 			if (type.validateValue(param)) {
 				return new SimpleStringProperty(param.getValue().getValue().getType()+"");
@@ -76,10 +73,12 @@ public class TableView {
 				return type.getComputedValue(param);
 			}
 		});
-		size.setPrefWidth(100);
+		size.setPrefWidth(50);
 		size.setCellValueFactory((TreeTableColumn.CellDataFeatures<DataModel, String> param) -> {
 			if (size.validateValue(param)) {
-				return new SimpleStringProperty(param.getValue().getValue().getSize()+"");
+				long s = param.getValue().getValue().getSize();
+				s=s/1024;
+				return new SimpleStringProperty(s+"KB");
 			} else {
 				return size.getComputedValue(param);
 			}
@@ -87,7 +86,8 @@ public class TableView {
 		createTime.setPrefWidth(100);
 		createTime.setCellValueFactory((TreeTableColumn.CellDataFeatures<DataModel, String> param) -> {
 			if (createTime.validateValue(param)) {
-				return new SimpleStringProperty(param.getValue().getValue().getCreateTime()+"");
+				return new SimpleStringProperty(sdf.format(param.getValue().getValue().getCreateTime()));
+
 			} else {
 				return createTime.getComputedValue(param);
 			}
@@ -95,20 +95,9 @@ public class TableView {
 
 	}
 
-	public JFXTreeTableView<DataModel> cleateTable(List<Document> dataList){
+	public JFXTreeTableView<DataModel> cleateTable(List<DataModel> dataList){
 		ObservableList<DataModel> users = FXCollections.observableArrayList();
-		for (Document doc : dataList) {
-			DataModel dataModel = new DataModel();
-			dataModel.setCode(Integer.parseInt(doc.get("code")));
-			dataModel.setName(doc.get("name_txt"));
-			dataModel.setType(doc.get("type"));
-			dataModel.setPath(doc.get("path"));
-			dataModel.setSize(Long.valueOf(doc.get("size")));
-			dataModel.setCreateTime(new Date());
-			users.add(dataModel);
-		}
-		
-		
+		dataList.forEach(e->users.add(e));
 		final TreeItem<DataModel> root = new RecursiveTreeItem<>(users, RecursiveTreeObject::getChildren);
 		JFXTreeTableView<DataModel> treeView = new JFXTreeTableView<>(root);
 		treeView.setShowRoot(false);

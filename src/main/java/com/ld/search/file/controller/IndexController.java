@@ -14,19 +14,22 @@ package com.ld.search.file.controller;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-
+import com.jfoenix.animation.alert.JFXAlertAnimation;
+import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTextField;
-import com.ld.lucenex.service.BasisService;
+import com.ld.search.file.App;
 import com.ld.search.file.core.DataGrab;
+import com.ld.search.file.core.DataModel;
 import com.ld.search.file.core.TableView;
+import com.ld.search.file.lucene.SearchFileService;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 
 /**
  * @ClassName: IndexController
@@ -37,7 +40,7 @@ import javafx.scene.layout.Pane;
 public class IndexController {
 
 	@FXML
-	JFXTextField fileName;
+	TextField fileName;
 	@FXML
 	JFXButton search;
 	@FXML
@@ -67,9 +70,19 @@ public class IndexController {
 	 * @throws IOException 
 	 */
 	public void searchName() throws IOException {
-		BasisService basisService = new BasisService("search");
-		List<Document> search_1 = basisService.searchList(new TermQuery(new Term("name_txt","java")),Integer.MAX_VALUE);
-		data.getChildren().add(new TableView().cleateTable(search_1));
+		List<DataModel> list = new SearchFileService("search").searchFile("", fileName.getText());
+		if(list == null || list.isEmpty()) {
+			//JFXDialog
+			JFXDialogLayout layout = new JFXDialogLayout();
+	        layout.setBody(new Label("没有找到您想要的数据。。。。。"));
+			 JFXAlert<Void> alert = new JFXAlert<>(App.stage);
+		        alert.setAnimation(JFXAlertAnimation.CENTER_ANIMATION);
+		        alert.setContent(layout);
+		        alert.initModality(Modality.NONE);
+		        alert.show();
+		}else {
+			data.getChildren().add(new TableView().cleateTable(list));
+		}
 		//		ObservableList<String> list = FXCollections.observableArrayList();
 		//		BasisService basisService = new BasisService("search");
 		//		List<Document> search_1 = basisService.searchList(new TermQuery(new Term("name_str",fileName.getText())),Integer.MAX_VALUE);

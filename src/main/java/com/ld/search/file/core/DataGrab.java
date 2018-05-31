@@ -37,7 +37,7 @@ public class DataGrab {
 				List<File> fileList = new ArrayList<>();
 				File[] roots = File.listRoots();
 				for (int i =0; i < roots.length; i++) {
-					getListFile(new File("D:\\work"), fileList);
+					getListFile(new File("D:\\ceshi"), fileList);
 //					getListFile(roots[1], fileList);
 					break;
 				}

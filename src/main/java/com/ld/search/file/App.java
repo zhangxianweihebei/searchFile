@@ -21,8 +21,11 @@ import javafx.stage.StageStyle;
  */
 public class App extends Application{
 	
+	public static Stage stage;
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		stage = primaryStage;
 		primaryStage.initStyle(StageStyle.TRANSPARENT);
 		URL url = getClass().getResource("page/Ceshi.fxml");
 		FXMLLoader fxmlLoader = new FXMLLoader(url);
@@ -32,7 +35,7 @@ public class App extends Application{
 		primaryStage.show();
 		LuceneX.start(Config.class);
 		IndexController index = fxmlLoader.getController();
-		index.searchName();
+//		index.searchName();
 		DragUtil.addDragListener(primaryStage,index.getHandler() );
 	}
 
