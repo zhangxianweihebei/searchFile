@@ -8,7 +8,6 @@ import com.ld.search.file.lucene.Config;
 import com.ld.search.file.util.DragUtil;
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -35,7 +34,8 @@ public class App extends Application{
 		primaryStage.show();
 		LuceneX.start(Config.class);
 		IndexController index = fxmlLoader.getController();
-//		index.searchName();
+		index.updateIndex();
+		index.typeMonitor();
 		DragUtil.addDragListener(primaryStage,index.getHandler() );
 	}
 

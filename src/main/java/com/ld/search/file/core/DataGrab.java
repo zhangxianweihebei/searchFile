@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
-import com.ld.lucenex.service.BasisService;
 import com.ld.lucenex.thread.LdThreadPool;
 import com.ld.lucenex.thread.future.LdFuture;
 import com.ld.lucenex.thread.future.LdFutureListener;
 import com.ld.lucenex.thread.future.LdThreadPoolFactory;
+import com.ld.search.file.lucene.SearchFileService;
 
 
 /**
@@ -37,8 +37,8 @@ public class DataGrab {
 				List<File> fileList = new ArrayList<>();
 				File[] roots = File.listRoots();
 				for (int i =0; i < roots.length; i++) {
-					getListFile(new File("D:\\ceshi"), fileList);
-//					getListFile(roots[1], fileList);
+//					getListFile(new File("D:\\ceshi"), fileList);
+					getListFile(roots[1], fileList);
 					break;
 				}
 				int size = fileList.size();
@@ -73,7 +73,9 @@ public class DataGrab {
 			@Override
 			public void success(List<DataModel> v) {
 				try {
-					new BasisService("search").addIndex(v);
+					SearchFileService service = new SearchFileService("search");
+					service.deleteAll();
+					service.addIndex(v);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

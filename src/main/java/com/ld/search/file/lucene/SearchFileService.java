@@ -27,7 +27,6 @@ import org.apache.lucene.search.TermQuery;
 
 import com.ld.lucenex.core.LuceneX;
 import com.ld.lucenex.service.BasisService;
-import com.ld.search.file.core.DataGrab;
 import com.ld.search.file.core.DataModel;
 
 /**
@@ -37,6 +36,13 @@ import com.ld.search.file.core.DataModel;
  * @date: 2018年5月31日 上午10:00:36
  */
 public class SearchFileService extends BasisService{
+
+	static final String Archive = "rar,zip,cab,iso,jar,ace,7z,tar,gz,arj,lzh,z,bz2";
+	static final String programing = "java,class,xml,html,css,js,jsp,php,yml";
+	static final String word = "txt,docx,xlsx,rtf,jnt,pdf";
+	static final String video = "mp4,3gp,avi,mkv,wmv,mpg,vob,flv,swf,mov,xv,rmvb";
+	static final String music = "cd,wave,aiff,mpeg,mp3,mpeg-4,midi,wma,realaudio,vqf,oggvorbis,amr,ape,flac,aac";
+	static final String image = "bmp,jpg,png,tiff,gif,pcx,tga,exif,fpx,svg,psd,cdr,pcd,dxf,ufo,eps,ai,raw,wmf,webp";
 
 	public SearchFileService() {
 	}
@@ -50,22 +56,36 @@ public class SearchFileService extends BasisService{
 			return null;
 		}
 		FuzzyQuery fuzzyQuery = new FuzzyQuery(new Term("name_str", fileName));//模糊
-		TermQuery typeQuery = new TermQuery(new Term("type", type));
 		TermQuery txtQuery = new TermQuery(new Term("name_txt", fileName));//分词
 
 		BooleanClause fuzzyQ = new BooleanClause(fuzzyQuery, BooleanClause.Occur.SHOULD);//模糊查询
 		BooleanClause txtQ = new BooleanClause(txtQuery, BooleanClause.Occur.SHOULD);//分词查询
-		BooleanClause typeQ = new BooleanClause(typeQuery, BooleanClause.Occur.FILTER);//过滤类型
 
 		Builder builder = new BooleanQuery.Builder();
-		builder.add(fuzzyQ)
-		.add(txtQ);
+		builder.add(fuzzyQ).add(txtQ);
 		if(StringUtils.isNotEmpty(type)) {
-//			builder.add(typeQ);
-			if(type.equals("dev")) {
+			switch (type) {
+			case "all":
+				break;
+			case "programing":
 				setDev(builder);
-			}else if(type.equals("image")) {
+				break;
+			case "word":
+				setWord(builder);
+				break;
+			case "video":
+				setVideo(builder);
+				break;
+			case "music":
+				setMusic(builder);
+				break;
+			case "image":
 				setImage(builder);
+				break;
+			case "Archive":
+				break;
+			default:
+				break;
 			}
 		}
 		List<Document> searchList = searchList(builder.build(), Integer.MAX_VALUE);
@@ -91,35 +111,85 @@ public class SearchFileService extends BasisService{
 		return list;
 	}
 
-	//开发类型 java
+	/**
+	 * @Title: setDev
+	 * @Description: 编程
+	 * @param builder
+	 * @return: void
+	 */
 	public void setDev(Builder builder) {
-		BooleanQuery build = new BooleanQuery.Builder()
-		.add(new BooleanClause(new TermQuery(new Term("type", "java")), BooleanClause.Occur.SHOULD))
-		.add(new BooleanClause(new TermQuery(new Term("type", "class")), BooleanClause.Occur.SHOULD))
-		.add(new BooleanClause(new TermQuery(new Term("type", "xml")), BooleanClause.Occur.SHOULD))
-		.add(new BooleanClause(new TermQuery(new Term("type", "fxml")), BooleanClause.Occur.SHOULD))
-		.add(new BooleanClause(new TermQuery(new Term("type", "html")), BooleanClause.Occur.SHOULD)).build();
-		builder.add(build, BooleanClause.Occur.FILTER);
+		BooleanQuery query = toBooleanQuery(programing);
+		builder.add(query, BooleanClause.Occur.FILTER);
 	}
 
-	//图片类型 java
+	/**
+	 * @Title: setImage
+	 * @Description: 图片
+	 * @param builder
+	 * @return: void
+	 */
 	public void setImage(Builder builder) {
-		BooleanQuery build = new BooleanQuery.Builder()
-		.add(new BooleanClause(new TermQuery(new Term("type", "jpg")), BooleanClause.Occur.SHOULD))
-		.add(new BooleanClause(new TermQuery(new Term("type", "png")), BooleanClause.Occur.SHOULD)).build();
-		builder.add(build, BooleanClause.Occur.FILTER);
+		BooleanQuery query = toBooleanQuery(image);
+		builder.add(query, BooleanClause.Occur.FILTER);
 	}
-	//视频类型 java
-	public void setvideo(Builder builder) {
-		BooleanQuery build = new BooleanQuery.Builder()
-				.add(new BooleanClause(new TermQuery(new Term("type", "mpg")), BooleanClause.Occur.SHOULD))
-				.add(new BooleanClause(new TermQuery(new Term("type", "avi")), BooleanClause.Occur.SHOULD)).build();
-				builder.add(build, BooleanClause.Occur.FILTER);
+	/**
+	 * @Title: setVideo
+	 * @Description: 视频
+	 * @param builder
+	 * @return: void
+	 */
+	public void setVideo(Builder builder) {
+		BooleanQuery query = toBooleanQuery(video);
+		builder.add(query, BooleanClause.Occur.FILTER);
+	}
+	/**
+	 * @Title: setMusic
+	 * @Description: 音乐
+	 * @param builder
+	 * @return: void
+	 */
+	public void setMusic(Builder builder) {
+		BooleanQuery query = toBooleanQuery(music);
+		builder.add(query, BooleanClause.Occur.FILTER);
 	}
 	
+	/**
+	 * @Title: setWord
+	 * @Description: 文档
+	 * @param builder
+	 * @return: void
+	 */
+	public void setWord(Builder builder) {
+		BooleanQuery query = toBooleanQuery(word);
+		builder.add(query, BooleanClause.Occur.FILTER);
+	}
+	/**
+	 * @Title: setArchive
+	 * @Description: 压缩包
+	 * @param builder
+	 * @return: void
+	 */
+	public void setArchive(Builder builder) {
+		BooleanQuery query = toBooleanQuery(Archive);
+		builder.add(query, BooleanClause.Occur.FILTER);
+	}
+	
+	public BooleanQuery toBooleanQuery(String types) {
+		Builder builder = new BooleanQuery.Builder();
+		String[] split = types.split(",");
+		for (String string : split) {
+			builder.add(toBooleanClause(string));
+		}
+		return builder.build();
+	}
+	
+	public BooleanClause toBooleanClause(String type) {
+		return new BooleanClause(new TermQuery(new Term("type", type)), BooleanClause.Occur.SHOULD);
+	}
+
 	public static void main(String[] args) throws IOException {
 		LuceneX.start(Config.class);
-//		new DataGrab().create();
+		//		new DataGrab().create();
 		List<DataModel> searchFile = new SearchFileService("search").searchFile("image", "123");
 		searchFile.forEach(e->System.out.println(e));
 	}
