@@ -17,8 +17,11 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import com.ld.search.file.util.CalculateUtils;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -77,8 +80,17 @@ public class TableView {
 		size.setCellValueFactory((TreeTableColumn.CellDataFeatures<DataModel, String> param) -> {
 			if (size.validateValue(param)) {
 				long s = param.getValue().getValue().getSize();
-				s=s/1024;
-				return new SimpleStringProperty(s+"KB");
+				if(s <= 1024) {
+					return new SimpleStringProperty(s+"KB");
+				}else if(s <= 1048576) {
+					Double d1 = Double.valueOf(s);
+					Double d2 = Double.valueOf(1024);
+					return new SimpleStringProperty(CalculateUtils.div(d1, d2, 5)+"MB");
+				}else {
+					Double d1 = Double.valueOf(s);
+					Double d2 = Double.valueOf(1048576);
+					return new SimpleStringProperty(CalculateUtils.div(d1, d2, 5)+"GB");
+				}
 			} else {
 				return size.getComputedValue(param);
 			}
@@ -105,7 +117,18 @@ public class TableView {
 		treeView.setPrefWidth(605.0);
 		treeView.setPrefHeight(380.0);
 		treeView.getColumns().setAll(name,path,type,size,createTime);
+		treeView.getSelectionModel().selectedItemProperty().addListener(
+                new ChangeListener<TreeItem <DataModel>>() {
+                @Override
+                public void changed(ObservableValue<? extends TreeItem<DataModel>> observableValue,
+                TreeItem<DataModel> oldItem, TreeItem<DataModel> newItem) {
+                	SceneFactory.build().getController("Ceshi").setFileView(newItem.getValue());
+                }
+            });
+		
+		
 		return treeView;
 	}
 
 }
+  

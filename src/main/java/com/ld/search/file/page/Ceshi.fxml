@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import com.jfoenix.controls.*?>
@@ -25,15 +28,25 @@
          </children></Pane>
       <TextField fx:id="fileName" layoutX="10.0" layoutY="75.0" prefHeight="35.0" prefWidth="500.0" style="-fx-border-color: #00BFFF;" />
       <JFXListView layoutX="10.0" layoutY="120.0" prefHeight="380.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" />
-      <JFXButton fx:id="all" layoutX="10.0" layoutY="120.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #00BFFF;" text="全部" />
-      <JFXButton fx:id="programing" layoutX="10.0" layoutY="170.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="编程" />
-      <JFXButton fx:id="word" layoutX="10.0" layoutY="220.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="文档" />
-      <JFXButton fx:id="video" layoutX="10.0" layoutY="270.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="视频" />
-      <JFXButton fx:id="music" layoutX="10.0" layoutY="320.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="音乐" />
-      <JFXButton fx:id="image" layoutX="10.0" layoutY="370.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="图片" />
-      <JFXButton fx:id="Archive" layoutX="10.0" layoutY="420.0" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="压缩" />
+      <JFXButton fx:id="all" layoutX="10.0" layoutY="120.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #00BFFF;" text="全部" />
+      <JFXButton fx:id="programing" layoutX="10.0" layoutY="160.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="编程" />
+      <JFXButton fx:id="word" layoutX="10.0" layoutY="210.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="文档" />
+      <JFXButton fx:id="video" layoutX="10.0" layoutY="260.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="视频" />
+      <JFXButton fx:id="music" layoutX="10.0" layoutY="310.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="音乐" />
+      <JFXButton fx:id="image" layoutX="10.0" layoutY="360.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="图片" />
+      <JFXButton fx:id="Archive" layoutX="10.0" layoutY="410.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="压缩" />
       <Pane fx:id="data" layoutX="60.0" layoutY="120.0" prefHeight="380.0" prefWidth="605.0" style="-fx-background-color: #F5F5F5;" />
-      <JFXButton layoutX="520.0" layoutY="75.0" onAction="#searchName" prefHeight="35.0" prefWidth="145.0" style="-fx-background-color: #00BFFF;" text="查询" />
-      <Pane layoutX="670.0" layoutY="75.0" prefHeight="425.0" prefWidth="225.0" style="-fx-background-color: #F5F5F5;" />
+      <JFXButton layoutX="520.0" layoutY="75.0" onAction="#updateIndex" prefHeight="35.0" prefWidth="145.0" style="-fx-background-color: #00BFFF;" text="更新索引库" textFill="WHITE" />
+      <Pane layoutX="670.0" layoutY="75.0" prefHeight="425.0" prefWidth="225.0" style="-fx-background-color: #F5F5F5;">
+         <children>
+            <Pane fx:id="showFile" prefHeight="225.0" prefWidth="225.0" style="-fx-background-color: red;" />
+            <JFXTextField fx:id="jFileName" layoutY="250.0" prefWidth="225.0" promptText="文件名" />
+            <JFXTextField fx:id="jFilePath" layoutY="280.0" prefWidth="225.0" promptText="文件路径" />
+            <JFXTextField fx:id="jFileType" layoutY="310.0" prefWidth="225.0" promptText="文件类型" />
+            <JFXTextField fx:id="jFileSize" layoutY="340.0" prefWidth="225.0" promptText="文件大小" />
+            <JFXTextField fx:id="jFiletime" layoutY="370.0" prefWidth="225.0" promptText="创建时间" />
+            <JFXButton layoutY="395.0" onAction="#openFile" prefHeight="30.0" prefWidth="225.0" style="-fx-background-color: #00FFFF;" text="打开文件" textFill="#1b1a1a" />
+         </children></Pane>
+      <JFXButton fx:id="directory" layoutX="10.0" layoutY="450.0" prefHeight="40.0" prefWidth="50.0" style="-fx-background-color: #F5F5F5;" text="目录" />
    </children>
 </Pane>

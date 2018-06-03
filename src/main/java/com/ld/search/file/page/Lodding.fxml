@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="900.0" style="-fx-background-color: #00BFFF;;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ld.search.file.controller.IndexController">
+   <children>
+      <JFXSpinner layoutX="409.0" layoutY="215.0" />
+      <JFXSlider fx:id="schedule" layoutY="471.0" prefWidth="900.0" value="0" />
+      <Text fx:id="lodding" fill="#f2eded" layoutX="308.0" layoutY="395.0" strokeType="OUTSIDE" strokeWidth="0.0" text="正在初始化" textAlignment="CENTER" wrappingWidth="252.240234375">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Text>
+   </children>
+</Pane>

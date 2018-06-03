@@ -7,13 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 
-import com.ld.lucenex.thread.LdThreadPool;
-import com.ld.lucenex.thread.future.LdFuture;
-import com.ld.lucenex.thread.future.LdFutureListener;
-import com.ld.lucenex.thread.future.LdThreadPoolFactory;
 import com.ld.search.file.lucene.SearchFileService;
 
 
@@ -23,89 +17,77 @@ import com.ld.search.file.lucene.SearchFileService;
  *
  */
 public class DataGrab {
-
-
-	LdThreadPoolFactory poolFactory = LdThreadPool.build().get();
-	/**
-	 * 1小时内必须扫描完
-	 */
-	public void create(){
-		LdFuture<List<DataModel>> ldFuture = poolFactory.submit(new Callable<List<DataModel>>() {
-			@Override
-			public List<DataModel> call() throws Exception {
-				List<DataModel> datalist = new ArrayList<>();
-				List<File> fileList = new ArrayList<>();
-				File[] roots = File.listRoots();
-				for (int i =0; i < roots.length; i++) {
-//					getListFile(new File("D:\\ceshi"), fileList);
-					getListFile(roots[1], fileList);
-					break;
-				}
-				int size = fileList.size();
-				CountDownLatch countDownLatch = new CountDownLatch(size);
-				for (int j = 0; j < size; j++) {
-					File file = fileList.get(j);
-					poolFactory.execute(new Runnable() {
-						@Override
-						public void run() {
-							DataModel dataModel = new DataModel();
-							dataModel.setCode(file.hashCode());
-							dataModel.setName(file.getName());
-							dataModel.setPath(file.getPath());
-							dataModel.setSize(file.length());
-							String name = dataModel.getName();
-							String[] split = name.split("\\.");
-							if(split.length > 1) {
-								dataModel.setType(name.substring(name.lastIndexOf(".") + 1));
-							}
-							dataModel.setCreateTime(new Date(file.lastModified()));
-							datalist.add(dataModel);
-							countDownLatch.countDown();
-						}
-					});
-				}
-				countDownLatch.await();
-				return datalist;
-			}
-		});
-		ldFuture.addListener(new LdFutureListener<List<DataModel>>() {
-			
-			@Override
-			public void success(List<DataModel> v) {
-				try {
-					SearchFileService service = new SearchFileService("search");
-					service.deleteAll();
-					service.addIndex(v);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			@Override
-			public void error(Throwable throwable) {
-				throwable.printStackTrace();
-			}
-		});
-	}
-
-	public void getListFile(File file, List<File> list) {
-		//文件不存在
-		if(!file.exists())
-			return;
-		if(file.isDirectory()) {//是目录
-			File[] listFiles = file.listFiles();
-			if(listFiles == null || listFiles.length <= 0) {
-				return;
-			}
-			for(int i=0;i<listFiles.length;i++) {
-				getListFile(listFiles[i], list);
-			}
-			
-		}else {//是文件
-			list.add(file);
+	
+	public static void getFileTotal(File file) {
+		if(file.getPath().equals(System.getenv("windir"))) return ;
+		File[] listFiles = file.listFiles();
+		if(listFiles == null) return;
+		SceneFactory.build().setTotalSize(listFiles.length);
+		for(int i=0;i<listFiles.length;i++) {
+			getFileTotal(listFiles[i]);
 		}
 	}
 	
-	public static void main(String[] args) {
+	/**
+	 * 1小时内必须扫描完
+	 */
+	static Integer k=0;
+	public void create() throws IOException{
+		k=0;
+		SceneFactory.build().getController("Lodding").setMsg("初始化中。。。");
+		SearchFileService service = new SearchFileService("search");
+		try {
+			service.deleteAll();
+		} catch (IOException e1) {
+			// TODO 自动生成的 catch 块
+			e1.printStackTrace();
+		}
+		
+		File[] roots = File.listRoots();
+		for (int i =0; i < roots.length; i++) {
+			File file = roots[i];
+			List<DataModel> datalist = new ArrayList<>();
+			SceneFactory.build().getController("Lodding").setMsg("正在扫描-->"+file.getPath());
+			getListFile(file, datalist);
+			try {
+				SceneFactory.build().getController("Lodding").setMsg("正在提交-->"+file.getPath());
+				service.addIndex(datalist);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		SceneFactory.build().switIndex("Ceshi");
+	}
+
+	public void getListFile(File file,List<DataModel> dataList) {
+		if(file.getPath().equals(System.getenv("windir"))) return ;
+		File[] listFiles = file.listFiles();
+		if(listFiles == null) return;
+		for(int i=0;i<listFiles.length;i++) {
+			File f = listFiles[i];
+			DataModel dataModel = new DataModel();
+			dataModel.setCode(f.hashCode());
+			dataModel.setName(f.getName());
+			dataModel.setPath(f.getPath());
+			dataModel.setSize(f.length());
+			if(f.isDirectory()) {//目录
+				dataModel.setType("目录");
+			}else {//文件
+				String name = dataModel.getName();
+				String[] split = name.split("\\.");
+				if(split.length > 1) {
+					dataModel.setType(name.substring(name.lastIndexOf(".") + 1));
+				}
+			}
+			dataModel.setCreateTime(new Date(f.lastModified()));
+			dataList.add(dataModel);
+			++k;
+			SceneFactory.build().getController("Lodding").schedule(k);
+			getListFile(f,dataList);
+		}
+	}
+	
+	public static void main(String[] args) throws IOException {
 		System.out.println("开始扫描");
 		DataGrab grab = new DataGrab();
 		grab.create();

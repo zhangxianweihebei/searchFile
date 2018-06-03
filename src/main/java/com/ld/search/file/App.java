@@ -1,9 +1,14 @@
 package com.ld.search.file;
 
+import java.io.File;
 import java.net.URL;
+import java.util.Date;
 
 import com.ld.lucenex.core.LuceneX;
+import com.ld.lucenex.thread.LdThreadPool;
 import com.ld.search.file.controller.IndexController;
+import com.ld.search.file.core.DataGrab;
+import com.ld.search.file.core.SceneFactory;
 import com.ld.search.file.lucene.Config;
 import com.ld.search.file.util.DragUtil;
 
@@ -20,23 +25,32 @@ import javafx.stage.StageStyle;
  */
 public class App extends Application{
 	
-	public static Stage stage;
-	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		stage = primaryStage;
+		SceneFactory factory = SceneFactory.build();
+		factory.init(primaryStage);
+		factory.initSystem();
 		primaryStage.initStyle(StageStyle.TRANSPARENT);
-		URL url = getClass().getResource("page/Ceshi.fxml");
-		FXMLLoader fxmlLoader = new FXMLLoader(url);
-		Pane root = (Pane)fxmlLoader.load();
-		Scene scene = new Scene(root);
+		SceneFactory.build().getParent("Ceshi").setVisible(true);
+		Scene scene = new Scene(factory.getParent("Ceshi"));
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		LuceneX.start(Config.class);
-		IndexController index = fxmlLoader.getController();
-		index.updateIndex();
+		addMonitor(factory.getController("Ceshi"));
+		initTotalSize();
+	}
+	
+	public static void addMonitor(IndexController index) {
 		index.typeMonitor();
-		DragUtil.addDragListener(primaryStage,index.getHandler() );
+		DragUtil.addDragListener(SceneFactory.build().getStage(),index.getHandler() );
+	}
+	
+	public static void initTotalSize() {
+		File[] roots = File.listRoots();
+		for (int i = 0; i < roots.length; i++) {
+			File file = roots[i];
+			DataGrab.getFileTotal(file);
+		}
 	}
 
 	public static void main( String[] args ){

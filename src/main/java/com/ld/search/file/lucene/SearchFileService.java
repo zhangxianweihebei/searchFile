@@ -11,7 +11,11 @@
  */
 package com.ld.search.file.lucene;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,20 +53,54 @@ public class SearchFileService extends BasisService{
 	public SearchFileService(String dataKey) {
 		super(dataKey);
 	}
+	
+	public static InputStream getImageUrl(DataModel data) {
+		String type = data.getType();
+		InputStream imageUrl = null;
+		if(type == null) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/unknown.jpg");
+			return imageUrl;
+		}
+		if(Archive.indexOf(type) != -1) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/Archive.jpg");
+		}else if(programing.indexOf(type) != -1) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/programing.jpg");
+		}else if(word.indexOf(type) != -1) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/word.jpg");
+		}else if(video.indexOf(type) != -1) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/video.jpg");
+		}else if(music.indexOf(type) != -1) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/music.png");
+		}else if("目录".indexOf(type) != -1) {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/directory.png");
+		}else if(image.indexOf(type) != -1) {
+			try {
+				imageUrl = new FileInputStream(new File(data.getPath()));
+			} catch (FileNotFoundException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+		}else {
+			imageUrl = SearchFileService.class.getResourceAsStream("/com/ld/search/file/controller/image/unknown.jpg");
+		}
+		return imageUrl;
+	}
 	//以上 构造函数 必须写
 
 	public List<DataModel> searchFile(String type,String fileName) throws IOException{
 		if(StringUtils.isEmpty(fileName)) {
 			return null;
 		}
+		fileName = fileName.toLowerCase();
 		FuzzyQuery fuzzyQuery = new FuzzyQuery(new Term("name_str", fileName));//模糊
 		TermQuery txtQuery = new TermQuery(new Term("name_txt", fileName));//分词
 
-		BooleanClause fuzzyQ = new BooleanClause(fuzzyQuery, BooleanClause.Occur.SHOULD);//模糊查询
-		BooleanClause txtQ = new BooleanClause(txtQuery, BooleanClause.Occur.SHOULD);//分词查询
+		BooleanQuery booleanQuery = new BooleanQuery.Builder()
+				.add(new BooleanClause(fuzzyQuery, BooleanClause.Occur.SHOULD))
+				.add(new BooleanClause(txtQuery, BooleanClause.Occur.SHOULD)).build();
 
 		Builder builder = new BooleanQuery.Builder();
-		builder.add(fuzzyQ).add(txtQ);
+		builder.add(booleanQuery,BooleanClause.Occur.MUST);
 		if(StringUtils.isNotEmpty(type)) {
 			switch (type) {
 			case "all":
@@ -83,6 +121,10 @@ public class SearchFileService extends BasisService{
 				setImage(builder);
 				break;
 			case "Archive":
+				setArchive(builder);
+				break;
+			case "directory":
+				setDirectory(builder);
 				break;
 			default:
 				break;
@@ -111,6 +153,11 @@ public class SearchFileService extends BasisService{
 		return list;
 	}
 
+	private void setDirectory(Builder builder) {
+		BooleanQuery query = toBooleanQuery("目录");
+		builder.add(query, BooleanClause.Occur.FILTER);
+		
+	}
 	/**
 	 * @Title: setDev
 	 * @Description: 编程
